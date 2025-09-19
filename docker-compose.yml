@@ -15,13 +15,14 @@ services:
       - PULSE_COOKIE=/root/.config
       - OM_API_KEY_ID=${OM_API_KEY_ID}
       - OM_API_KEY=${OM_API_KEY}
+      - CAMERA_INDEX=${CAMERA_INDEX:-/dev/video6}
     volumes:
       - /dev/snd:/dev/snd:rw
       - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:rw
       - ~/.config/pulse/cookie:/root/.config/pulse/cookie:ro
     devices:
       - /dev/snd:/dev/snd
-      - /dev/video0:/dev/video0
+      - /dev/video6:/dev/video6
     logging:
       driver: "json-file"
       options:
