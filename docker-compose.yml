@@ -4,7 +4,7 @@ services:
   mediamtx:
     build:
       context: ./mediamtx
-      dockerfile: ./mediamtx/Dockerfile
+      dockerfile: Dockerfile
     image: openmindagi/mediamtx:latest
     container_name: mediamtx
     restart: unless-stopped
