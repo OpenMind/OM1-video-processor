@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  mediamtx:
+    build:
+      context: ./mediamtx
+      dockerfile: ./mediamtx/Dockerfile
+    image: openmindagi/mediamtx:latest
+    container_name: mediamtx
+    restart: unless-stopped
+    network_mode: host
+    privileged: true
+    environment:
+      - PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native
+      - PULSE_COOKIE=/root/.config
+      - OM_API_KEY_ID=${OM_API_KEY_ID}
+      - OM_API_KEY=${OM_API_KEY}
+    volumes:
+      - /dev/snd:/dev/snd:rw
+      - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:rw
+      - ~/.config/pulse/cookie:/root/.config/pulse/cookie:ro
+    devices:
+      - /dev/snd:/dev/snd
+      - /dev/video0:/dev/video0
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    cap_add:
+      - SYS_PTRACE
+      - NET_ADMIN
+    security_opt:
+      - apparmor:unconfined
+    group_add:
+      - audio
