@@ -16,6 +16,7 @@ services:
       - OM_API_KEY_ID=${OM_API_KEY_ID}
       - OM_API_KEY=${OM_API_KEY}
       - CAMERA_INDEX=${CAMERA_INDEX:-/dev/video6}
+      - MICROPHONE_INDEX=${MICROPHONE_INDEX:-hw:3,0}
     volumes:
       - /dev/snd:/dev/snd:rw
       - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:rw

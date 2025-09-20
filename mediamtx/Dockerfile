@@ -4,7 +4,23 @@ RUN apt-get update && apt-get install -y \
     supervisor \
     ffmpeg \
     curl \
+    libasound2 \
+    libasound2-data \
+    libasound2-plugins \
+    libpulse0 \
+    alsa-utils \
+    alsa-topology-conf \
+    alsa-ucm-conf \
+    pulseaudio-utils \
     && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /etc/alsa && \
+    ln -snf /usr/share/alsa/alsa.conf.d /etc/alsa/conf.d
+
+RUN printf '%s\n' \
+  'pcm.!default { type pulse }' \
+  'ctl.!default { type pulse }' \
+  > /etc/asound.conf
 
 RUN ARCH=$(uname -m) && \
     if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then \
