@@ -2,9 +2,6 @@ name: Build and Push Docker Image
 on:
   push:
     branches: [ "main" ]
-    paths-ignore:
-      - "docs/**"
-      - "mintlify/**"
     tags:
       - 'v*'
 
@@ -33,7 +30,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: openmindagi/mediamtx
+          images: openmindagi/om1_video_processor
           tags: |
             type=semver,pattern={{version}},prefix=v
             type=semver,pattern={{major}}.{{minor}},prefix=v
@@ -45,7 +42,7 @@ jobs:
         id: build
         uses: docker/build-push-action@v5
         with:
-          context: ./mediamtx
+          context: .
           push: true
           platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
@@ -73,7 +70,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: openmindagi/mediamtx
+          images: openmindagi/om1_video_processor
           tags: |
             type=semver,pattern={{version}},prefix=v
             type=semver,pattern={{major}}.{{minor}},prefix=v
@@ -85,7 +82,7 @@ jobs:
         id: build
         uses: docker/build-push-action@v5
         with:
-          context: ./mediamtx
+          context: .
           push: true
           platforms: linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
@@ -125,6 +122,6 @@ jobs:
 
             docker buildx imagetools create \
               --tag $tag \
-              openmindagi/mediamtx@${{ needs.build-amd64.outputs.image-digest }} \
-              openmindagi/mediamtx@${{ needs.build-arm64.outputs.image-digest }}
+              openmindagi/om1_video_processor@${{ needs.build-amd64.outputs.image-digest }} \
+              openmindagi/om1_video_processor@${{ needs.build-arm64.outputs.image-digest }}
           done
