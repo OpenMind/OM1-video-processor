@@ -6,5 +6,5 @@ readme = "README.md"
 requires-python = ">=3.9"
 
 dependencies = [
-    "om1-modules @ git+https://github.com/OpenMind/om1-modules.git@51c0601a5aa910b3386583f53e47e7e76bceebda",
+    "om1-modules @ git+https://github.com/OpenMind/om1-modules.git@e24426ff251bb72a0e12cd6c1f517d1cc896ac56",
 ]
