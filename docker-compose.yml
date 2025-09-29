@@ -1,15 +1,17 @@
 version: '3.8'
 
 services:
-  mediamtx:
+  om1_video_processor:
     build:
-      context: ./mediamtx
+      context: .
       dockerfile: Dockerfile
-    image: openmindagi/mediamtx:latest
-    container_name: mediamtx
+    image: openmindagi/om1_video_processor:latest
+    container_name: om1_video_processor
     restart: unless-stopped
     network_mode: host
     privileged: true
+    runtime: nvidia
+    shm_size: "4g"
     environment:
       - PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native
       - PULSE_COOKIE=/root/.config
@@ -21,6 +23,7 @@ services:
       - /dev/snd:/dev/snd:rw
       - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:rw
       - ~/.config/pulse/cookie:/root/.config/pulse/cookie:ro
+      - ./.venv:/app/om1_video_processor/.venv
     devices:
       - /dev/snd:/dev/snd
       - /dev/video6:/dev/video6

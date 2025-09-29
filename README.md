@@ -1,28 +1,33 @@
-# OM1 Tools
+# OM1 Video Processor
 
-A Docker-based video streaming solution for OpenMind that captures video from local cameras and streams it to OpenMind's video ingestion API.
+A Docker-based video streaming solution for OpenMind that captures video from local cameras, performs face recognition, and streams the results to OpenMind's video ingestion API.
 
 ## Overview
 
-This tool uses MediaMTX (formerly rtsp-simple-server) to create a video streaming pipeline that:
-1. Captures video from a local camera (e.g., `/dev/video0`)
-2. Streams it locally via RTMP
-3. Relays the stream to OpenMind's video ingestion API
+This tool uses the OM1 modules to create an intelligent video streaming pipeline that:
+1. Captures video from a local camera (e.g., `/dev/video6`)
+2. Performs real-time face recognition with bounding boxes and name overlays
+3. Captures audio from a microphone (e.g., `hw:3,0`)
+4. Streams the processed video and audio directly to OpenMind's video ingestion API via RTSP
 
 ## Features
 
-- **Multi-architecture support**: Works on both x86_64 and ARM64 architectures
-- **Automatic video capture**: Uses FFmpeg to capture from V4L2 devices
-- **Real-time streaming**: Low-latency streaming with optimized encoding settings
+- **GPU-accelerated processing**: Optimized for NVIDIA Jetson platforms with CUDA support
+- **Real-time face recognition**: Live face detection with bounding boxes and name overlays
+- **Audio capture**: Integrated microphone support with PulseAudio
+- **Direct RTSP streaming**: Streams directly to OpenMind's API without intermediate relay
 - **Automatic restart**: All services restart automatically if they fail
-- **Audio support**: Configured for PulseAudio integration
+- **FPS monitoring**: Real-time performance metrics display
+- **Configurable devices**: Supports multiple camera and microphone configurations
 
 ## Prerequisites
 
 - Docker and Docker Compose
-- A USB camera or built-in webcam accessible at `/dev/video0`
+- NVIDIA Jetson device with JetPack 6.1 (or compatible NVIDIA GPU system)
+- A USB camera or built-in webcam (default: `/dev/video6`)
+- A microphone device (default: `hw:3,0`)
 - OpenMind API credentials
-- Linux system with V4L2 support
+- Linux system with V4L2 and ALSA support
 
 ## Setup
 
@@ -38,9 +43,19 @@ This tool uses MediaMTX (formerly rtsp-simple-server) to create a video streamin
    export OM_API_KEY="your_api_key"
    ```
 
-3. Ensure your camera is accessible:
+3. (Optional) Configure camera and microphone devices:
    ```bash
+   export CAMERA_INDEX="/dev/video6"    # Default camera device
+   export MICROPHONE_INDEX="hw:3,0"     # Default microphone device
+   ```
+
+4. Ensure your devices are accessible:
+   ```bash
+   # Check available video devices
    ls /dev/video*
+
+   # Check available audio devices
+   arecord -l
    ```
 
 ## Usage
@@ -70,34 +85,43 @@ The system is configured through several components:
 ### Docker Compose Configuration
 
 The `docker-compose.yml` file configures:
+- **NVIDIA runtime**: GPU acceleration for face recognition processing
 - **Network mode**: Host networking for direct device access
 - **Privileged mode**: Required for camera and audio device access
-- **Device mapping**: Camera (`/dev/video0`) and audio (`/dev/snd`) devices
-- **Environment variables**: OpenMind API credentials and PulseAudio configuration
+- **Device mapping**: Camera (default `/dev/video6`) and audio (`/dev/snd`) devices
+- **Environment variables**: OpenMind API credentials, device indices, and PulseAudio configuration
+- **Shared memory**: 4GB allocated for efficient video processing
 
-### Video Pipeline
+### Processing Pipeline
 
-The streaming pipeline consists of three processes managed by Supervisor:
+The streaming pipeline consists of two processes managed by Supervisor:
 
-1. **MediaMTX**: RTMP server that receives and manages video streams
-2. **FFmpeg Capture**: Captures video from `/dev/video0` and streams to local MediaMTX
-3. **FFmpeg Relay**: Relays the stream to OpenMind's video ingestion API
+1. **MediaMTX**: RTSP server for stream routing and management
+2. **OM Face Recognition Stream**: Main processing service that:
+   - Captures video from the specified camera device
+   - Performs real-time face recognition with GPU acceleration
+   - Overlays bounding boxes, names, and FPS information
+   - Captures audio from the specified microphone
+   - Streams directly to OpenMind's RTSP ingestion endpoint
 
-### Video Settings
+### Environment Variables
 
-Current configuration:
-- **Resolution**: 640x480
-- **Frame rate**: 30 FPS
-- **Codec**: H.264 with ultrafast preset
-- **Optimization**: Zero-latency tuning for real-time streaming
+The following environment variables can be configured:
+
+- `OM_API_KEY_ID`: Your OpenMind API key ID (required)
+- `OM_API_KEY`: Your OpenMind API key (required)
+- `CAMERA_INDEX`: Camera device path (default: `/dev/video6`)
+- `MICROPHONE_INDEX`: Microphone device identifier (default: `hw:3,0`)
 
 ## Ports
 
-The following ports are exposed:
-- **8554**: RTSP
-- **1935**: RTMP
-- **8889**: HLS
-- **8189**: WebRTC
+The following ports are used internally:
+- **8554**: RTSP (MediaMTX local server)
+- **1935**: RTMP (MediaMTX local server)
+- **8889**: HLS (MediaMTX local server)
+- **8189**: WebRTC (MediaMTX local server)
+
+Note: The main video stream is sent directly to OpenMind's RTSP endpoint at `rtsp://api-video-ingest.openmind.org:8554/`
 
 ## Troubleshooting
 
@@ -108,12 +132,27 @@ ls /dev/video*
 
 # Test camera with v4l2
 v4l2-ctl --list-devices
+
+# Test specific camera device
+v4l2-ctl --device=/dev/video6 --list-formats-ext
+```
+
+### Audio issues:
+```bash
+# Check available audio recording devices
+arecord -l
+
+# Test microphone recording
+arecord -D hw:3,0 -f cd test.wav
 ```
 
 ### Permission issues:
 ```bash
 # Add your user to video and audio groups
 sudo usermod -a -G video,audio $USER
+
+# Ensure device permissions
+sudo chmod 666 /dev/video6
 ```
 
 ### Check container logs:
@@ -122,22 +161,33 @@ sudo usermod -a -G video,audio $USER
 docker-compose logs
 
 # View specific service logs
-docker-compose logs mediamtx
+docker-compose logs om1_video_processor
+
+# Follow logs in real-time
+docker-compose logs -f om1_video_processor
 ```
 
-### Test local stream:
+### GPU/CUDA issues:
 ```bash
-# Test RTMP stream locally
-ffplay rtmp://localhost:1935/live
+# Check NVIDIA runtime availability
+docker info | grep nvidia
+
+# Test CUDA in container
+docker run --rm --runtime=nvidia --gpus all nvidia/cuda:11.0-base nvidia-smi
 ```
 
 ## Architecture
 
 ```
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────────┐
-│   Camera    │───▶│   FFmpeg    │───▶│   MediaMTX  │───▶│   OpenMind API  │
-│ /dev/video0 │    │   Capture   │    │    RTMP     │    │   Video Ingest  │
-└─────────────┘    └─────────────┘    └─────────────┘    └─────────────────┘
+┌─────────────┐    ┌─────────────────────────────────┐    ┌─────────────────┐
+│   Camera    │───▶│     OM Face Recognition         │───▶│   OpenMind API  │
+│ /dev/video6 │    │   - GPU-accelerated processing  │    │   RTSP Ingest   │
+└─────────────┘    │   - Face detection & naming     │    │                 │
+                   │   - Bounding box overlay        │    └─────────────────┘
+┌─────────────┐    │   - FPS monitoring              │
+│ Microphone  │───▶│   - Audio capture & streaming   │
+│   hw:3,0    │    └─────────────────────────────────┘
+└─────────────┘
 ```
 
 ## Development
@@ -145,15 +195,29 @@ ffplay rtmp://localhost:1935/live
 ### Building the image:
 
 ```bash
-docker build -t openmindagi/mediamtx:latest ./mediamtx
+docker-compose build
 ```
 
-### Customizing video settings:
+### Customizing processing settings:
 
-Edit the FFmpeg command in `mediamtx/supervisord.conf` to change:
-- Video resolution: `-video_size 640x480`
-- Frame rate: `-framerate 30`
-- Input device: `-i /dev/video0`
+Edit the command in `video_processor/supervisord.conf` to modify the `om_face_recog_stream` parameters:
+- `--device`: Camera device path
+- `--rtsp-mic-device`: Microphone device identifier
+- `--draw-boxes`: Enable/disable bounding box overlays
+- `--draw-names`: Enable/disable name overlays
+- `--show-fps`: Enable/disable FPS display
+- `--no-window`: Run in headless mode
+- `--remote-rtsp`: OpenMind RTSP ingestion endpoint
+
+### Local development:
+
+```bash
+# Install dependencies locally
+uv sync --all-extras
+
+# Run the face recognition stream locally
+uv run om_face_recog_stream --help
+```
 
 ## License
 
@@ -170,5 +234,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 For issues related to:
 - **OpenMind API**: Contact OpenMind support
+- **OM1 Modules**: Check the [OM1 modules repository](https://github.com/OpenMind/om1-modules)
 - **MediaMTX**: Check the [MediaMTX documentation](https://github.com/bluenviron/mediamtx)
+- **NVIDIA Jetson**: Check the [JetPack documentation](https://developer.nvidia.com/embedded/jetpack)
 - **This tool**: Open an issue in this repository

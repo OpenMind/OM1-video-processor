@@ -1,0 +1,10 @@
+[project]
+name = "om1-video-processor"
+version = "1.0.0"
+description = "OM Video Processor"
+readme = "README.md"
+requires-python = ">=3.9"
+
+dependencies = [
+    "om1-modules @ git+https://github.com/OpenMind/om1-modules.git@51c0601a5aa910b3386583f53e47e7e76bceebda",
+]
