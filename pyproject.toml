@@ -3,8 +3,9 @@ name = "om1-video-processor"
 version = "1.0.0"
 description = "OM Video Processor"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.9,<4.0"
 
 dependencies = [
-    "om1-modules @ git+https://github.com/OpenMind/om1-modules.git@e24426ff251bb72a0e12cd6c1f517d1cc896ac56",
+    "om1-modules @ git+https://github.com/OpenMind/om1-modules.git@fbd18de4d87069e490e0349b736a17109ecc1afe",
+    "pycuda (>=2025.1.2,<2026.0.0)",
 ]
