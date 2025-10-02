@@ -17,8 +17,8 @@ services:
       - PULSE_COOKIE=/root/.config
       - OM_API_KEY_ID=${OM_API_KEY_ID}
       - OM_API_KEY=${OM_API_KEY}
-      - CAMERA_INDEX=${CAMERA_INDEX:-/dev/video6}
-      - MICROPHONE_INDEX=${MICROPHONE_INDEX:-hw:3,0}
+      - CAMERA_INDEX=${CAMERA_INDEX:-/dev/video0}
+      - MICROPHONE_INDEX=${MICROPHONE_INDEX:-default_mic_aec}
     volumes:
       - /dev/snd:/dev/snd:rw
       - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:rw
@@ -26,7 +26,7 @@ services:
       - ./.venv:/app/om1_video_processor/.venv
     devices:
       - /dev/snd:/dev/snd
-      - /dev/video6:/dev/video6
+      - /dev/video0:/dev/video0
     logging:
       driver: "json-file"
       options:
