@@ -45,17 +45,24 @@ This tool uses the OM1 modules to create an intelligent video streaming pipeline
 
 3. (Optional) Configure camera and microphone devices:
    ```bash
-   export CAMERA_INDEX="/dev/video6"    # Default camera device
-   export MICROPHONE_INDEX="hw:3,0"     # Default microphone device
+   export CAMERA_INDEX="/dev/video0"    # Default camera device
+   export MICROPHONE_INDEX="default_mic_aec"     # Default microphone device
    ```
+
+> [!NOTE]
+> Please refer to the [OpenMind Avatar documentation](https://github.com/OpenMind/OM1-avatar) for the audio and video device configuration details.
 
 4. Ensure your devices are accessible:
    ```bash
    # Check available video devices
    ls /dev/video*
 
+   # List video devices with v4l2
+   v4l2-ctl --list-devices
+
    # Check available audio devices
-   arecord -l
+   pactl list sources short
+   pactl list sinks short
    ```
 
 ## Usage
@@ -110,8 +117,8 @@ The following environment variables can be configured:
 
 - `OM_API_KEY_ID`: Your OpenMind API key ID (required)
 - `OM_API_KEY`: Your OpenMind API key (required)
-- `CAMERA_INDEX`: Camera device path (default: `/dev/video6`)
-- `MICROPHONE_INDEX`: Microphone device identifier (default: `hw:3,0`)
+- `CAMERA_INDEX`: Camera device path (default: `/dev/video0`)
+- `MICROPHONE_INDEX`: Microphone device identifier (default: `default_mic_aec`)
 
 ## Ports
 
@@ -134,17 +141,22 @@ ls /dev/video*
 v4l2-ctl --list-devices
 
 # Test specific camera device
-v4l2-ctl --device=/dev/video6 --list-formats-ext
+v4l2-ctl --device=/dev/video0 --list-formats-ext
 ```
 
 ### Audio issues:
 ```bash
 # Check available audio recording devices
-arecord -l
+pactl list sources short
+pactl list sinks short
 
 # Test microphone recording
-arecord -D hw:3,0 -f cd test.wav
+arecord -D default_mic_aec -f cd test.wav
+aplay test.wav
 ```
+
+> [!NOTE]
+> The pactl has the noise suppression module enabled by default for better audio quality. Use arecord to test the raw microphone input without noise suppression.
 
 ### Permission issues:
 ```bash
@@ -152,7 +164,7 @@ arecord -D hw:3,0 -f cd test.wav
 sudo usermod -a -G video,audio $USER
 
 # Ensure device permissions
-sudo chmod 666 /dev/video6
+sudo chmod 666 /dev/video0
 ```
 
 ### Check container logs:
