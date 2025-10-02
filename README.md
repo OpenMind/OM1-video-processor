@@ -7,7 +7,7 @@ A Docker-based video streaming solution for OpenMind that captures video from lo
 This tool uses the OM1 modules to create an intelligent video streaming pipeline that:
 1. Captures video from a local camera (e.g., `/dev/video0`)
 2. Performs real-time face recognition with bounding boxes and name overlays
-3. Captures audio from a microphone (e.g., `hw:3,0`)
+3. Captures audio from a microphone (e.g., `default_mic_aec`)
 4. Streams the processed video and audio directly to OpenMind's video ingestion API via RTSP
 
 ## Features
@@ -25,7 +25,7 @@ This tool uses the OM1 modules to create an intelligent video streaming pipeline
 - Docker and Docker Compose
 - NVIDIA Jetson device with JetPack 6.1 (or compatible NVIDIA GPU system)
 - A USB camera or built-in webcam (default: `/dev/video0`)
-- A microphone device (default: `hw:3,0`)
+- A microphone device (default: `default_mic_aec`)
 - OpenMind API credentials
 - Linux system with V4L2 and ALSA support
 
