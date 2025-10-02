@@ -5,7 +5,7 @@ A Docker-based video streaming solution for OpenMind that captures video from lo
 ## Overview
 
 This tool uses the OM1 modules to create an intelligent video streaming pipeline that:
-1. Captures video from a local camera (e.g., `/dev/video6`)
+1. Captures video from a local camera (e.g., `/dev/video0`)
 2. Performs real-time face recognition with bounding boxes and name overlays
 3. Captures audio from a microphone (e.g., `hw:3,0`)
 4. Streams the processed video and audio directly to OpenMind's video ingestion API via RTSP
@@ -24,7 +24,7 @@ This tool uses the OM1 modules to create an intelligent video streaming pipeline
 
 - Docker and Docker Compose
 - NVIDIA Jetson device with JetPack 6.1 (or compatible NVIDIA GPU system)
-- A USB camera or built-in webcam (default: `/dev/video6`)
+- A USB camera or built-in webcam (default: `/dev/video0`)
 - A microphone device (default: `hw:3,0`)
 - OpenMind API credentials
 - Linux system with V4L2 and ALSA support
@@ -95,7 +95,7 @@ The `docker-compose.yml` file configures:
 - **NVIDIA runtime**: GPU acceleration for face recognition processing
 - **Network mode**: Host networking for direct device access
 - **Privileged mode**: Required for camera and audio device access
-- **Device mapping**: Camera (default `/dev/video6`) and audio (`/dev/snd`) devices
+- **Device mapping**: Camera (default `/dev/video0`) and audio (`/dev/snd`) devices
 - **Environment variables**: OpenMind API credentials, device indices, and PulseAudio configuration
 - **Shared memory**: 4GB allocated for efficient video processing
 
@@ -191,15 +191,16 @@ docker run --rm --runtime=nvidia --gpus all nvidia/cuda:11.0-base nvidia-smi
 ## Architecture
 
 ```
-┌─────────────┐    ┌─────────────────────────────────┐    ┌─────────────────┐
-│   Camera    │───▶│     OM Face Recognition         │───▶│   OpenMind API  │
-│ /dev/video6 │    │   - GPU-accelerated processing  │    │   RTSP Ingest   │
-└─────────────┘    │   - Face detection & naming     │    │                 │
-                   │   - Bounding box overlay        │    └─────────────────┘
-┌─────────────┐    │   - FPS monitoring              │
-│ Microphone  │───▶│   - Audio capture & streaming   │
-│   hw:3,0    │    └─────────────────────────────────┘
-└─────────────┘
+┌──────────────┐    ┌─────────────────────────────────┐    ┌─────────────────┐
+│    Camera    │───▶│     OM Face Recognition         │───▶│   OpenMind API  │
+│  /dev/video0 │    │   - GPU-accelerated processing  │    │   RTSP Ingest   │
+└──────────────┘    │   - Face detection & naming     │    │                 │
+                    │   - Bounding box overlay        │    └─────────────────┘
+┌──────────────┐    │   - FPS monitoring              │
+│  Microphone  │───▶│   - Audio capture & streaming   │
+│ default_mic_ │    └─────────────────────────────────┘
+│    aec       │
+└──────────────┘
 ```
 
 ## Development
