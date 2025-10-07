@@ -1,0 +1,18 @@
+{
+  "meta": {
+    "model_sig": "arc-trt-l2-512",
+    "dim": 512,
+    "created": "2025-10-06T23-27-05",
+    "updated": "2025-10-07T00-32-07"
+  },
+  "items": {
+    "john/aligned/john.jpg": {
+      "row": 0,
+      "label": "john"
+    },
+    "wendy/aligned/2025-10-07T00-32-07.jpg": {
+      "row": 1,
+      "label": "wendy"
+    }
+  }
+}
