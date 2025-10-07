@@ -6,6 +6,6 @@ readme = "README.md"
 requires-python = ">=3.9,<4.0"
 
 dependencies = [
-    "om1-modules @ git+https://github.com/OpenMind/om1-modules.git@fbd18de4d87069e490e0349b736a17109ecc1afe",
+    "om1-modules @ git+https://github.com/OpenMind/om1-modules.git@0f96fd2c4ff6708bd16428b9c5c6972e11552710",
     "pycuda (>=2025.1.2,<2026.0.0)",
 ]
