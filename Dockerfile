@@ -28,6 +28,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       cmake \
       pkg-config \
       curl \
+      jq \
       ca-certificates \
       python3-dev \
       python3-venv \
