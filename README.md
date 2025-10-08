@@ -33,8 +33,8 @@ This tool uses the OM1 modules to create an intelligent video streaming pipeline
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/OpenMind/OM1-tools.git
-   cd OM1-tools
+   git clone https://github.com/OpenMind/OM1-video-processor.git
+   cd OM1-video-processor
    ```
 
 2. Set your OpenMind API credentials as environment variables:
