@@ -13,15 +13,14 @@ services:
     runtime: nvidia
     shm_size: "8g"
     environment:
-      - CAMERA_INDEX=/dev/video0
-      - MICROPHONE_INDEX=plughw:2,0
+      - CAMERA_INDEX=${CAMERA_INDEX:-/dev/video0}
+      - MICROPHONE_INDEX=${MICROPHONE_INDEX:-default_mic_aec}
       - PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native
       - PULSE_COOKIE=/root/.config
       - OM_API_KEY_ID=${OM_API_KEY_ID}
       - OM_API_KEY=${OM_API_KEY}
       - GALLERY_DIR=/data/gallery
       - EMBEDS_DIR=/data/embeds
-      - RTSP_MIC_AC=1
     volumes:
       - /dev/snd:/dev/snd:rw
       - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:rw
