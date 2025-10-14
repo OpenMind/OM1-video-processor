@@ -531,7 +531,7 @@ wheels = [
 [[package]]
 name = "om1-modules"
 version = "0.1.0"
-source = { git = "https://github.com/OpenMind/om1-modules.git?rev=513d48a907c380e2723b1194268fac0f15bae00b#513d48a907c380e2723b1194268fac0f15bae00b" }
+source = { git = "https://github.com/OpenMind/om1-modules.git?rev=c502b03a90e17769e597f15b3625b865335d56bf#c502b03a90e17769e597f15b3625b865335d56bf" }
 dependencies = [
     { name = "av" },
     { name = "eclipse-zenoh" },
@@ -558,7 +558,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "om1-modules", git = "https://github.com/OpenMind/om1-modules.git?rev=513d48a907c380e2723b1194268fac0f15bae00b" },
+    { name = "om1-modules", git = "https://github.com/OpenMind/om1-modules.git?rev=c502b03a90e17769e597f15b3625b865335d56bf" },
     { name = "pycuda", specifier = ">=2025.1.2,<2026.0.0" },
 ]
 
