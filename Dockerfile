@@ -43,6 +43,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      software-properties-common && \
+    add-apt-repository -y ppa:ubuntu-toolchain-r/test && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+      libstdc++-12-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 COPY --from=uvbin /uv /uvx /usr/local/bin/
 
 RUN mkdir -p /etc/alsa && \
